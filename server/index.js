@@ -1,21 +1,26 @@
-require("dotenv").config();
 const express = require("express");
-const app = express();
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const cors = require("cors");
-const connection = require("./db");
-const userRoutes = require("./routes/users");
-const authRoutes = require("./routes/auth");
 
-// database connection
-connection();
+const app = express();
 
-// middlewares
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(cors());
 
-// routes
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
+// Connect to MongoDB
+mongoose.connect(
+  "mongodb+srv://somanath89121:Somu1234@cluster0.qimi6od.mongodb.net/TT?retryWrites=true&w=majority",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
-const port = process.env.PORT || 8080;
-app.listen(port, console.log(`Listening on port ${port}...`));
+app.use("/api/users", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/taskRoutes"));
+app.use("/api", require("./routes/emailRoutes"));
+
+const port = process.env.PORT || 3001;
+app.listen(port, () => console.log(`Server running on port ${port}`));
